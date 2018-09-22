@@ -1,35 +1,37 @@
 const express = require('express');
-const MongoClient = require('mongodb').MongoClient;
+const mongoose = require('mongoose');
 const app = express();
+const documents = require('./schemas/documents.js');
 
-const dbUrl = 'mongodb://' + process.env.DB_USER + ':' + process.env.DB_PASS + '@ds245512.mlab.com:45512';
-const dbName = '50-50-links';
-
+mongoose.connect('mongodb://' + process.env.USER + ':' + process.env.PASSWORD + '@' + process.env.DBLINK);
 app.use(express.static("frontend"));
 
 app.get('/', (req, res) => res.redirect("/newLink.html"));
 
 app.get('/:linkName', handleLinkAccess);
+app.post('/new', insertLink); 
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
 
 function handleLinkAccess(req, res) {
-    MongoClient.connect(dbUrl, function (err, client) {
-        if (err)
-            res.sendStatus(503);
+  let url = req.params.linkName;
+  documents.findOne({name: url}, function(err, doc){
+    if(err || !doc || !doc.urls) res.status(404).json({'error': 'Invalid linking name'});
+    else{
+      res.status(301).redirect(doc.urls[Math.floor(Math.random()*(doc.urls.length+1))]);
+    }
+  });
+}
 
-        const db = client.db(dbName);
-
-        const collection = db.collection('documents');
-
-        collection.find({name: req.params.linkName}).toArray(function (err, docs) {
-            if(err)
-                res.sendStatus(404);
-            console.log("Found the following records");
-            console.log(docs);
-            res.json(docs);
-        });
-
-        client.close();
-    });
+function insertLink(req, res){
+  let url = req.params.name;
+  let links = req.params.urls;
+  let newUrl = documents({
+    name: url,
+    urls: links
+  });
+  newUrl.save(function(err){
+    if(err) res.status(403).json({'error': 'Name already taken or another error inserting'});
+    res.status(201).json({'message': 'inserted'});
+  });
 }
