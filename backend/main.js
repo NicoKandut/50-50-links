@@ -4,11 +4,14 @@ const mongoose = require('mongoose');
 const app = express();
 const documents = require('./schemas/documents.js');
 
-// get port
+// get env variables - default values are temporary
 const port = process.env.PORT || 3000;
+const user = process.env.DB_USER || "chris";
+const pass = process.env.DB_PASS || "chris1234";
+const address = process.env.DB_ADDRESS || "ds245512.mlab.com:45512/50-50-links";
 
 // create mongoose connection
-mongoose.connect('mongodb://' + process.env.DB_USER + ':' + process.env.DB_PASS + '@' + process.env.DB_ADDRESS);
+mongoose.connect('mongodb://' + user + ':' + pass + '@' + address);
 
 // provide frontend files
 app.use(express.static("frontend"));
@@ -17,14 +20,14 @@ app.use(express.static("frontend"));
 // handle link access
 app.get('/', (req, res) => res.redirect("/newLink.html"));
 app.get('/:linkName', (req, res) => {
-    let url = req.params.linkName;
     documents.findOne({
-        name: url
+        name: req.params.linkName
     }, function (err, doc) {
-        if (err || !doc || !doc.urls) res.status(404).json({
-            'error': 'Invalid linking name'
-        });
-        else {
+        if (err || !doc || !doc.urls) {
+            res.status(404).json({
+                'error': 'invalid link'
+            });
+        } else {
             res.status(301).redirect(doc.urls[Math.floor(Math.random() * (doc.urls.length + 1))]);
         }
     });
@@ -32,16 +35,17 @@ app.get('/:linkName', (req, res) => {
 
 // handle link creation
 app.post('/new', (req, res) => {
-    let url = req.params.name;
-    let links = req.params.urls;
-    let newUrl = documents({
-        name: url,
-        urls: links
+    let link = documents({
+        name: req.params.name,
+        urls: req.params.urls
     });
-    newUrl.save(function (err) {
-        if (err) res.status(403).json({
-            'error': 'Name already taken or another error inserting'
-        });
+
+    link.save(function (err) {
+        if (err)
+            res.status(403).json({
+                'error': 'failed to insert link'
+            });
+
         res.status(201).json({
             'message': 'inserted'
         });
