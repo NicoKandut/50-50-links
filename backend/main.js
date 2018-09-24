@@ -9,7 +9,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-mongoose.connect('mongodb://' + process.env.USER + ':' + process.env.PASSWORD + '@' + process.env.DBLINK);
+mongoose.connect('mongodb://' + process.env.DB_USER + ':' + process.env.DB_PASS + '@' + process.env.DB_ADDRESS);
 app.use(express.static("frontend"));
 
 app.get('/', (req, res) => res.redirect("/newLink.html"));
