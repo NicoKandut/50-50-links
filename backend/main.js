@@ -17,7 +17,7 @@ app.get('/', (req, res) => res.redirect("/newLink.html"));
 app.get('/:linkName', handleLinkAccess);
 app.post('/new', insertLink); 
 
-app.listen(3000, () => console.log('Example app listening on port 3000!'));
+app.listen(process.env.PORT, () => console.log('Example app listening on port 3000!'));
 
 function handleLinkAccess(req, res) {
   let url = req.params.linkName;
