@@ -24,7 +24,8 @@ function handleLinkAccess(req, res) {
   documents.findOne({name: url}, function(err, doc){
     if(!doc || !doc.urls) res.status(404).json({'error': 'Invalid linking name'});
     else{
-      res.status(301).redirect(doc.urls[Math.floor(Math.random()*(doc.urls.length+1))]);
+     let idx = Math.round(Math.abs(Math.random() * doc.urls.length - 1));
+      res.status(301).redirect(doc.urls[idx]);
     }
   });
 }
