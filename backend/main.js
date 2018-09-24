@@ -1,56 +1,56 @@
-// require packages
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
 const documents = require('./schemas/documents.js');
+const bodyParser = require('body-parser');
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+ 
+// parse application/json
+app.use(bodyParser.json())
 
-// get env variables - default values are temporary
-const port = process.env.PORT || 3000;
-const user = process.env.DB_USER || "chris";
-const pass = process.env.DB_PASS || "chris1234";
-const address = process.env.DB_ADDRESS || "ds245512.mlab.com:45512/50-50-links";
-
-// create mongoose connection
-mongoose.connect('mongodb://' + user + ':' + pass + '@' + address);
-
-// provide frontend files
+mongoose.connect('mongodb://' + process.env.USER + ':' + process.env.PASSWORD + '@' + process.env.DBLINK);
 app.use(express.static("frontend"));
 
-// Routes
-// handle link access
 app.get('/', (req, res) => res.redirect("/newLink.html"));
-app.get('/:linkName', (req, res) => {
-    documents.findOne({
-        name: req.params.linkName
-    }, function (err, doc) {
-        if (err || !doc || !doc.urls) {
-            res.status(404).json({
-                'error': 'invalid link'
-            });
-        } else {
-            res.status(301).redirect(doc.urls[Math.floor(Math.random() * (doc.urls.length + 1))]);
-        }
-    });
-});
 
-// handle link creation
-app.post('/new', (req, res) => {
-    let link = documents({
-        name: req.params.name,
-        urls: req.params.urls
-    });
+app.get('/:linkName', handleLinkAccess);
+app.post('/new', insertLink); 
 
-    link.save(function (err) {
-        if (err)
-            res.status(403).json({
-                'error': 'failed to insert link'
-            });
+app.listen(3000, () => console.log('Example app listening on port 3000!'));
 
-        res.status(201).json({
-            'message': 'inserted'
-        });
-    });
-});
+function handleLinkAccess(req, res) {
+  let url = req.params.linkName;
+  documents.findOne({name: url}, function(err, doc){
+    if(!doc || !doc.urls) res.status(404).json({'error': 'Invalid linking name'});
+    else{
+      res.status(301).redirect(doc.urls[Math.floor(Math.random()*(doc.urls.length+1))]);
+    }
+  });
+}
 
-// start listening
-app.listen(port, () => console.log('Example app listening on port ' + port + '!'));
+function insertLink(req, res){
+  let url = req.body.name;
+  let links = req.body.urls;
+  for(let i = 0; i < links.length; i++){
+    if(links[i].substring(0,5) == "http:" || links[i].substring(0,6) == "https:") {
+      switch(links[i].split(":")[0]){
+        case "http":  if(!/.\..+\./g.test(links[i].split("//")[1] )) links[i] = "http://www." + links[i].split("://")[1];
+                      break;
+        case "https": if(!/.\..+\./g.test(links[i].split("//")[1] )) links[i] = "https://www." + links[i].split("://")[1];
+                      break;
+      }
+    } else {
+      if(!/.\..+\./g.test(links[i])) links[i] = "www." + links[i];
+      links[i] = "http://" + links[i];
+    }
+  }
+  let newUrl = documents({
+    name: url,
+    urls: links
+  });
+  newUrl.save(function(err){
+    if(err) res.status(403).json({'error': 'Name already taken or another error inserting'});
+    else res.status(201).json({'message': 'inserted'});
+  });
+}
