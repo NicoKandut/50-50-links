@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Create a 50/50 link</title>
+</head>
+
+<body>
+    <header>
+        <h1>50/50 Links</h1>
+    </header>
+
+    <main>
+        <!-- Create New Link -->
+        <section>
+            <h2>Create a Link</h2>
+            <label for="input-name">Name</label>
+            <input type="text" name="input-name" id="input-name" required>
+            <br>
+            <ul id=list-urls></ul>
+            <label for="input-url-1">Url</label>
+            <input type="url" name="input-url" id="input-url" required>
+            <button id="button-add-url">Add</button>
+            <br>
+            <button id="button-new-link">Create</button>
+            <p id="create-message"></p>
+        </section>
+
+        <!-- All Available Links-->
+        <section>
+            <h2>Available Links</h2>
+            <ul id="list-links"></ul>
+        </section>
+    </main>
+
+    <footer>
+        <a href="https://github.com/NicoKandut/50-50-links">Github Repository</a>
+        <a href="https://github.com/NicoKandut">Nico Kandut</a>
+    </footer>
+
+    <script src="form.js"></script>
+</body>
+
+</html>

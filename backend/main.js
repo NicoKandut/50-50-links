@@ -1,57 +1,79 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const app = express();
-const documents = require('./schemas/documents.js');
-const bodyParser = require('body-parser');
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
- 
-// parse application/json
-app.use(bodyParser.json())
+const express = require('express'),
+    mongoose = require('mongoose'),
+    documents = require('./schemas/documents.js'),
+    bodyParser = require('body-parser'),
+    app = express();
 
-mongoose.connect('mongodb://' + process.env.DB_USER + ':' + process.env.DB_PASS + '@' + process.env.DB_ADDRESS);
+// env
+const PORT = process.env.PORT || 3000,
+    USER = process.env.DB_USER || "db_admin_xdsc13",
+    PASSWORD = process.env.DB_PASS || "ns83-bf0!-bsd0-32x3-e2ec",
+    ADDRESS = process.env.DB_ADDRESS || "ds245512.mlab.com:45512/50-50-links";
+
+// use
 app.use(express.static("frontend"));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 
-app.get('/', (req, res) => res.redirect("/newLink.html"));
+// mongoose
+mongoose.connect(`mongodb://${USER}:${PASSWORD}@${ADDRESS}`);
 
-app.get('/:linkName', handleLinkAccess);
-app.post('/new', insertLink); 
 
-app.listen(process.env.PORT, () => console.log('Example app listening on port 3000!'));
+// Routing
+app.get('/', (req, res) => res.redirect("/index.html"));
+app.get("/all", getAll);
+app.get('/link/:linkName', access);
+app.post('/new', create);
 
-function handleLinkAccess(req, res) {
-  let url = req.params.linkName;
-  documents.findOne({name: url}, function(err, doc){
-    if(!doc || !doc.urls) res.status(404).json({'error': 'Invalid linking name'});
-    else{
-     let idx = Math.round(Math.abs(Math.random() * doc.urls.length - 1));
-      res.status(301).redirect(doc.urls[idx]);
-    }
-  });
+// helpers
+function access(req, res) {
+    documents.findOne({
+        name: req.params.linkName
+    }, (err, doc) => {
+        if (err)
+            return res.status(500).json(err);
+        if (!doc || !doc.urls)
+            return res.status(404).send('Link not found.');
+
+        let idx = Math.round(Math.abs(Math.random() * doc.urls.length - 1));
+        res.status(301).redirect(doc.urls[idx]);
+    });
 }
 
-function insertLink(req, res){
-  let url = req.body.name;
-  let links = req.body.urls;
-  for(let i = 0; i < links.length; i++){
-    if(links[i].substring(0,5) == "http:" || links[i].substring(0,6) == "https:") {
-      switch(links[i].split(":")[0]){
-        case "http":  if(!/.\..+\./g.test(links[i].split("//")[1] )) links[i] = "http://www." + links[i].split("://")[1];
-                      break;
-        case "https": if(!/.\..+\./g.test(links[i].split("//")[1] )) links[i] = "https://www." + links[i].split("://")[1];
-                      break;
-      }
-    } else {
-      if(!/.\..+\./g.test(links[i])) links[i] = "www." + links[i];
-      links[i] = "http://" + links[i];
-    }
-  }
-  let newUrl = documents({
-    name: url,
-    urls: links
-  });
-  newUrl.save(function(err){
-    if(err) res.status(403).json({'error': 'Name already taken or another error inserting'});
-    else res.status(201).json({'message': 'inserted'});
-  });
+function getAll(req, res) {
+    documents.find({}, (err, docs) => {
+        if (err)
+            return res.status(500).json(err);
+
+        res.json(docs);
+    });
 }
+
+function create(req, res) {
+    let name = req.body.name,
+        urls = req.body.urls;
+
+    // check
+    if (!name || name === "")
+        return res.status(400).send("Name is required.");
+    if (!urls || urls.length < 2)
+        return res.status(400).send("At least two urls are required.");
+
+    let link = documents({
+        name: name,
+        urls: urls
+    });
+
+    // save
+    link.save(err => {
+        if (err)
+            return res.status(409).send('Name already taken.');
+
+        res.sendStatus(201);
+    });
+}
+
+// start
+app.listen(PORT, () => console.log(`Example app listening on port ${PORT}`));
