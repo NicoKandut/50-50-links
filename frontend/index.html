@@ -6,38 +6,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Create a 50/50 link</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
 </head>
 
 <body>
-    <header>
-        <h1>50/50 Links</h1>
+    <header class="page-header mb-3">
+        <h1>50/50 Links<br>
+            <small>Links that point to multiple locations.</small>
+        </h1>
     </header>
 
     <main>
         <!-- Create New Link -->
-        <section>
-            <h2>Create a Link</h2>
-            <label for="input-name">Name</label>
-            <input type="text" name="input-name" id="input-name" required>
-            <br>
-            <ul id=list-urls></ul>
-            <label for="input-url-1">Url</label>
-            <input type="url" name="input-url" id="input-url" required>
-            <button id="button-add-url">Add</button>
-            <br>
-            <button id="button-new-link">Create</button>
-            <p id="create-message"></p>
+        <section class="card mb-3">
+            <div class="card-header">
+                <h3 class="card-title">Create a Link</h3>
+                <small class="card-subtitle mb-2 text-muted">Create your own random links here.</small>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="input-name">Name</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">#</div>
+                        </div>
+
+                        <input type="text" class="form-control" id="input-name" aria-describedby="name-help"
+                            placeholder="Enter Name">
+                    </div>
+
+                    <small id="name-help" class="form-text text-muted">The name of the new Link.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="input-url">Urls</label>
+                    <ol id="list-urls" class="list-group mb-2"></ol>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="input-url" aria-describedby="url-help" placeholder="Enter Url">
+                        <div class="input-group-append">
+                            <button id="button-add-url" class="btn btn-success">Add</button>
+                        </div>
+                    </div>
+                    <small id="url-help" class="form-text text-muted">The name of the new Link.</small>
+                </div>
+                <button id="button-new-link" class="btn btn-success btn-block">Create</button>
+                <p id="create-message"></p>
+            </div>
+
+
         </section>
 
         <!-- All Available Links-->
-        <section>
-            <h2>Available Links</h2>
-            <ul id="list-links"></ul>
+        <section class="card">
+            <div class="card-header">
+            <h2 class="card-title">Available Links</h2>
+            <small class="card-subtitle mb-2 text-muted">Try out links that other people created.</small>
+            </div>
+            <div class="card-body">
+                <ul id="list-links" class="list-group"></ul>
+            </div>
         </section>
     </main>
 
-    <footer>
-        <a href="https://github.com/NicoKandut/50-50-links">Github Repository</a>
+    <footer class="d-flex justify-content-center p-3">
+        <a href="https://github.com/NicoKandut/50-50-links" class="mr-3">Github Repository</a>
         <a href="https://github.com/NicoKandut">Nico Kandut</a>
     </footer>
 

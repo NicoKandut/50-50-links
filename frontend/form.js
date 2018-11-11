@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         li.innerHTML = url;
         li.setAttribute("name", "new-url");
+        li.setAttribute("class", "list-group-item");
         inputUrl.value = "";
 
         listUrls.appendChild(li);
@@ -54,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 a.setAttribute("href", "Http://localhost:3000/link/" + link.name);
                 a.innerHTML = link.name;
                 li.appendChild(a);
+                li.setAttribute("class", "list-group-item");
                 listLinks.appendChild(li);      
             }
         else
