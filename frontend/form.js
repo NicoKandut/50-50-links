@@ -1,3 +1,5 @@
+const serverUrl = "https://fifty-fifty-links.herokuapp.com";
+
 document.addEventListener("DOMContentLoaded", () => {
     // set html references
     const buttonNewLink = document.getElementById("button-new-link"),
@@ -19,11 +21,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // send
         let xhr = new XMLHttpRequest();
-        xhr.open("POST", 'http://localhost:3000/new', true);
+        xhr.open("POST", serverUrl + "/new", true);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.addEventListener("load", () => {
             if (xhr.status === 201)
-                pMessage.innerHTML = "Link successfully created. Access it with: <a href=\"http://localhost:3000/link/" + name + "\">http://localhost:3000/link/" + name + "</a>";
+                pMessage.innerHTML = "Link successfully created. Access it with: <a href=\"" + serverUrl + "/link/" + name + "\">" + serverUrl + "/link/"+ name + "</a>";
             else
                 pMessage.innerHTML = xhr.responseText;
         });
@@ -46,13 +48,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", 'http://localhost:3000/all', true);
+    xhr.open("GET", serverUrl + '/all', true);
     xhr.addEventListener("load", () => {
         if (xhr.status === 200)
             for(let link of JSON.parse(xhr.responseText)) {
                 let li = document.createElement("li"),
                 a = document.createElement("a");
-                a.setAttribute("href", "Http://localhost:3000/link/" + link.name);
+                a.setAttribute("href", serverUrl + "/link/" + link.name);
                 a.innerHTML = link.name;
                 li.appendChild(a);
                 li.setAttribute("class", "list-group-item");
