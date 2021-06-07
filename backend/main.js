@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000,
   DB_USER = process.env.DB_USER,
   DB_PASSWORD = process.env.DB_PASS,
   DB_ADDRESS = process.env.DB_ADDRESS,
-  DB_NAME = process.env.DB_ADDRESS;
+  DB_NAME = process.env.DB_NAME;
 
 // use
 app.use(express.static("frontend"));
