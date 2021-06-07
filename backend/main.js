@@ -6,9 +6,10 @@ const express = require("express"),
 
 // env
 const PORT = process.env.PORT || 3000,
-  USER = process.env.DB_USER || "db_admin_xdsc13",
-  PASSWORD = process.env.DB_PASS || "ns83-bf0!-bsd0-32x3-e2ec",
-  ADDRESS = process.env.DB_ADDRESS || "ds245512.mlab.com:45512/50-50-links";
+  DB_USER = process.env.DB_USER,
+  DB_PASSWORD = process.env.DB_PASS,
+  DB_ADDRESS = process.env.DB_ADDRESS,
+  DB_NAME = process.env.DB_ADDRESS;
 
 // use
 app.use(express.static("frontend"));
@@ -20,7 +21,10 @@ app.use(
 );
 
 // mongoose
-mongoose.connect(`mongodb://${USER}:${PASSWORD}@${ADDRESS}`);
+mongoose.connect(
+  `mongodb+srv://${DB_USER}:${DB_PASSWORD}@${DB_ADDRESS}/${DB_NAME}?retryWrites=true&w=majority`,
+  { useNewUrlParser: true, useUnifiedTopology: true }
+);
 
 // Routing
 app.get("/", (req, res) => res.redirect("/index.html"));
